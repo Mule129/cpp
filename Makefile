@@ -13,8 +13,8 @@
 # # window는 mingw32-make 사용
 
 all:
-	g++ -Werror -o run *.cpp
+	g++ -Werror -o main *.cpp
 
 run:
-	./run
+	./main
 	
