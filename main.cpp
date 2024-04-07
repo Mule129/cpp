@@ -70,6 +70,7 @@ Array *addArray(Array *array = new Array()) {
     std::cin >> array->size;
     
     if (type == "int") {
+        array->type = INT;
         int* dump = new int[array->size];
         for (int i = 0; i < array->size; i++) {
             std::cout << "item[" << i << "]: " ;
@@ -79,6 +80,7 @@ Array *addArray(Array *array = new Array()) {
         }
         array->items = dump;
     } else if (type == "double") {
+        array->type = DOUBLE;
         double* dump = new double[array->size];
         for (int i = 0; i < array->size; i++) {
             std::cout << "item[" << i << "]: " ;
@@ -88,6 +90,7 @@ Array *addArray(Array *array = new Array()) {
         }
         array->items = dump;
     } else if (type == "string") {
+        array->type = STRING;
         std::string* dump = new std::string[array->size];
         for (int i = 0; i < array->size; i++) {
             std::cout << "item[" << i << "]: " ;
@@ -98,6 +101,7 @@ Array *addArray(Array *array = new Array()) {
         }
         array->items = dump;
     } else if (type == "array") {
+        array->type = ARRAY;
         Array* dump = new Array[array->size];
         for (int i = 0; i < array->size; i++) {
             std::cout << "item[" << i << "]: " ;
@@ -150,7 +154,7 @@ void addData(Database &database) {
         Array *array = new Array;
         array = addArray(array);
         if (array == nullptr) {
-            std::cout << "invalid type";
+            std::cout << "invalid type" << std::endl;
         } else {
             add(database, create(ARRAY, key, array));
         }

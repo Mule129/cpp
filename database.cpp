@@ -79,6 +79,5 @@ void remove(Database &database, std::string &key) {
 
 // 데이터베이스를 해제한다.
 void destroy(Database &database) {
-    delete[] database.entrys;
-    delete &database;
+    delete database.entrys;
 }
