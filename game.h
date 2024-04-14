@@ -13,7 +13,40 @@ class Game {
 private:
   // 게임 판을 나타내는 배열
   // board[x][y]가 true 인 경우 x, y 위치에 고정된 블록이 존재하는 것을 의미한다
-  bool board_[BOARD_WIDTH][BOARD_HEIGHT];
+  bool board_[BOARD_WIDTH][BOARD_HEIGHT] = {false};
+
+  int score;
+
+  int delay = 0;
+  int x, y;
+
+  // input controller  
+  void inputController();
+
+  // check full block and delete block
+  void clearBlock();
+
+  // make Tromino
+  void makeTromino();
+
+  // check block pos
+  void checkBlock();
+
+  // add this block for board_[x][y]
+  void addBlock();
+
+  // update next block
+  void nextBlock();
+
+  // draw
+  // draw Board
+  void drawBoard();
+
+  // draw score(time, line clear)
+  void drawScore();
+
+  // draw tromino
+  void drawTromino(int x, int y);
 
 public:
   // 게임의 한 프레임을 처리한다.
