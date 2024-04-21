@@ -30,7 +30,8 @@ private:
 
   bool exit;
 
-  Tetromino dump = Tetromino::I;
+  Tetromino thisDump = Tetromino::I;
+  Tetromino holdDump = Tetromino::I;
   Tetromino *thisTetromino = nullptr;
   Tetromino *nextTetromino = nullptr;
   Tetromino *holdTetromino = nullptr;
@@ -43,6 +44,10 @@ private:
 
   // input controller  
   void inputController();
+
+  // return margin from tromino
+  // way: left = 1, right = 2, top = 3, bottom = 4
+  int marginXY(int way);
 
   // rand int return
   int randInt();
