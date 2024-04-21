@@ -20,8 +20,6 @@ Game::Game() {
 void Game::initTrominoPos() {
     x = BOARD_WIDTH/2 - thisTetromino->size()/2;
     y = 0 - marginXY(3);
-    console::log(std::to_string(thisTetromino->size()));
-    console::log(thisTetromino->name());
 }
 
 Tetromino *Game::createTetromino(int rand) {
@@ -80,7 +78,7 @@ int Game::marginXY(int way) {
                 if (thisTetromino->check(i, j) && way == 1) {
                     return i;
                 } else if (thisTetromino->check(j, i) && way == 3) {
-                    return j;
+                    return i;
                 }
             }
         }
@@ -90,7 +88,7 @@ int Game::marginXY(int way) {
                 if (thisTetromino->check(i, j) && way == 2) {
                     return thisTetromino->size() - i - 1;
                 } else if (thisTetromino->check(j, i) && way == 4) {
-                    return thisTetromino->size() - j - 1;
+                    return thisTetromino->size() - i - 1;
                 }
             }
         }
@@ -129,16 +127,21 @@ int Game::randInt() {
 }
 
 int Game::underBlock() {
-    int underY = BOARD_HEIGHT;
+    int underY = BOARD_HEIGHT - thisTetromino->size() + marginXY(4);
     bool status = false;
 
-    for (int localY = y; localY < BOARD_HEIGHT; localY++) {
-        for (int localX = x; localX < thisTetromino->size(); localX++) {
-            
-        }
-
-        if (!status) {
-            break;
+    // 실제 테트로미노 사이즈만큼 반복
+    for (int i = 0 + marginXY(1); i < thisTetromino->size() - marginXY(2); i++) {
+        for (int j = thisTetromino->size() - marginXY(4) - 1; j >= 0 + marginXY(3); j--) {
+            // console::log(std::to_string(i)+":"+std::to_string(j));
+            if (thisTetromino->check(i, j)) {  // 채워진 블록이라면
+                // console::log("test");
+                for (int localY = y + j; localY < BOARD_HEIGHT; localY++) {  // y + j -> BOARD_HIGJT 까지 반복
+                    if (board_[x+i][localY] && underY > localY) {  // board[i][j]가 채워지고, under의 값이 더 크다면
+                        underY = localY - j - 1;
+                    }
+                }
+            }
         }
     }
     
@@ -207,10 +210,10 @@ void Game::addBlock() {
 }
 
 void Game::checkBlock() {  // TODO: 다음 클록에 넘어가기 직전 체크해야한다
-    // if (underBlock() == 0) {  // TODO: use Tetromino::check
-    //     addBlock();
-    //     nextBlock();
-    // }
+    if (underBlock() == 0) {  // TODO: use Tetromino::check
+        addBlock();
+        nextBlock();
+    }
     if (y + realY() >= BOARD_HEIGHT) {
         addBlock();
         nextBlock();
@@ -255,7 +258,7 @@ void Game::drawTromino(int x, int y) {
     thisTetromino->drawAt(
         SHADOW_STRING, 
         x, 
-        underBlock() - thisTetromino->size()
+        underBlock()
     );
 
     thisTetromino->drawAt(
@@ -299,7 +302,6 @@ void Game::update() {
     if (delay >= DROP_DELAY) {
         y++;
         delay = 0;
-        console::log(std::to_string(underBlock()) + std::to_string(x));
     } else {
         delay++;
     }
