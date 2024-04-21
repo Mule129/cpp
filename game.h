@@ -1,7 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <chrono>
+#include <iomanip>
+
 #include "tetromino.h"
+#include "console/console.h"
 
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
@@ -16,7 +20,8 @@ private:
   bool board_[BOARD_WIDTH][BOARD_HEIGHT] = {false};
 
   int score;
-  time_t startTime;
+  std::chrono::system_clock::time_point startTime;
+  std::chrono::system_clock::time_point endTime;
 
   bool holdCheck;
 
@@ -26,10 +31,13 @@ private:
   bool exit;
 
   Tetromino dump = Tetromino::I;
-  Tetromino *thisTetromino = &Tetromino::I;
-  Tetromino *nextTetromino = &Tetromino::I;
-  Tetromino *holdTetromino = &Tetromino::I;
+  Tetromino *thisTetromino = nullptr;
+  Tetromino *nextTetromino = nullptr;
+  Tetromino *holdTetromino = nullptr;
 
+  // init tromino pos
+  void initTrominoPos();
+  
   // create tromino
   Tetromino *createTetromino(int rand);
 
@@ -45,10 +53,20 @@ private:
   // return board y value (y + 1)
   int boardY();
 
-  // calculate tromino size
-  int calculateTromino();
+  // return tromino real x pos
+  int realX();
+
+  // return tromino real y pos
+  int realY();
 
   // check under block y pos for first x and first y
+  // check tromino x, y pos
+  //
+  // if tromino size != tromino real size:
+  //    return gap from tromino real size and board block
+  //
+  // this calculate result is x, y standard pos 
+  // (x + tromino real x size, y + tromino real y size)
   int underBlock();
 
   // check full block and delete block
@@ -69,6 +87,8 @@ private:
   // hold block
   void holdBlock();
 
+  std::string getTime();
+
   // draw
   // draw Board
   void drawBoard();
@@ -82,11 +102,11 @@ private:
   // draw tromino
   void drawTromino(int x, int y);
 
-  // draw next tromino
-  void drawNextTromino();
+  // draw next tromino for int x and int y (0, 0)
+  void drawNextTromino(int x, int y);
 
   // draw hold tromino
-  void drawHoldTromino();
+  void drawHoldTromino(int x, int y);
 
 public:
   // 게임의 한 프레임을 처리한다.

@@ -52,13 +52,14 @@ void Tetromino::drawAt(std::string s, int x, int y) {
     for (int i = 0; i < size_; i++) {
         for (int j = 0; j < size_; j++) {
             if (check(i, j)) {
-                console::draw(x+i, y+j, s);
+                console::draw(x+i + 1, y+j + 1, s);
             }
             
             index++;
         }
     }
 }
+
 
 Tetromino Tetromino::I("I", 4, "XXXXOOOOXXXXXXXX");
 Tetromino Tetromino::O("O", 2, "OOOO");

@@ -1,13 +1,9 @@
-#include <ctime>
-
 #include "game.h"
-#include "console/console.h"
-#include "tetromino.h"
 
 
 Game::Game() {
     score = 0;
-    startTime = time(NULL);
+    startTime = std::chrono::system_clock::now();
 
     exit = false;
     
@@ -15,7 +11,11 @@ Game::Game() {
     nextTetromino = createTetromino(randInt());
     holdTetromino = nullptr;
 
-    x = BOARD_WIDTH/2 + thisTetromino->size()/2;
+    initTrominoPos();
+}
+
+void Game::initTrominoPos() {
+    x = BOARD_WIDTH/2 - thisTetromino->size()/2;
     y = 2 + thisTetromino->size()/2;
 }
 
@@ -23,28 +23,21 @@ Tetromino *Game::createTetromino(int rand) {
     switch (rand)
     {
     case 0:
-        dump = Tetromino::I;
-        return &dump;
+        return &Tetromino::I;
     case 1:
-        dump = Tetromino::O;
-        return &dump;
+        return &Tetromino::O;
     case 2:
-        dump = Tetromino::T;
-        return &dump;
+        return &Tetromino::T;
     case 3:
-        dump = Tetromino::S;
-        return &dump;
+        return &Tetromino::S;
     case 4:
-        dump = Tetromino::Z;
-        return &dump;
+        return &Tetromino::Z;
     case 5:
-        dump = Tetromino::J;
-        return &dump;
+        return &Tetromino::J;
     case 6:
-        dump = Tetromino::O;
-        return &dump;
+        return &Tetromino::O;
     };
-    return &dump;
+    return nullptr;
 }
 
 void Game::inputController() {
@@ -54,9 +47,9 @@ void Game::inputController() {
 
     if (console::key(console::K_DOWN)) {
         delay *= 2;  // delay limit delete
-    } if (console::key(console::K_LEFT) && x > 0 && board_[x-1][y] == false) {
+    } if (console::key(console::K_LEFT) && x > 0) {
         x--;
-    } if (console::key(console::K_RIGHT) && x < BOARD_WIDTH-1) {
+    } if (console::key(console::K_RIGHT) && x < BOARD_WIDTH - realX()) {
         x++;
     } if (console::key(console::K_UP)) {
         y = underBlock();
@@ -73,16 +66,31 @@ void Game::inputController() {
     thisTetromino = &dump;
 }
 
-int Game::boardX() {
-    return x-1;
+
+int Game::realX() {
+    int x = 0;
+    for (int i = 0; i < thisTetromino->size(); i++) {
+        for (int j = 0; j < thisTetromino->size(); j++) {
+            if (thisTetromino->check(i, j) && x < i) {
+                x = i;
+            } 
+        }
+    }
+    
+    return x;
 }
 
-int Game::boardY() {
-    return y-1;
-}
+int Game::realY() {
+    int y = 0;
+    for (int i = 0; i < thisTetromino->size(); i++) {
+        for (int j = 0; j < thisTetromino->size(); j++) {
+            if (thisTetromino->check(i, j) && y < j) {
+                y = j;
+            } 
+        }
+    }
 
-int Game::calculateTromino() {
-    return thisTetromino->size()/2;
+    return y;
 }
 
 int Game::randInt() {
@@ -90,23 +98,26 @@ int Game::randInt() {
 }
 
 int Game::underBlock() {
-    int under_y = BOARD_HEIGHT;
-    for (int y = BOARD_HEIGHT; y > 0; y--) {
-        for (int x = 0; x < thisTetromino->size(); x++) {
-            if (board_[this->x + x][this->y] && under_y > y) {
-                under_y = y;
-            }
+    int underY = BOARD_HEIGHT;
+    bool status = false;
+
+    for (int localY = y; localY < BOARD_HEIGHT; localY++) {
+        for (int localX = x; localX < thisTetromino->size(); localX++) {
+            
+        }
+
+        if (!status) {
+            break;
         }
     }
-
-    return under_y;
+    
+    return underY;
 }
 
 void Game::nextBlock() {
-    x = BOARD_WIDTH/2 + calculateTromino();
-    y = 2 + calculateTromino();
+    initTrominoPos();
 
-    thisTetromino = nextTetromino;
+    *thisTetromino = *nextTetromino;
     nextTetromino = createTetromino(randInt());
 }
 
@@ -115,14 +126,16 @@ void Game::holdBlock() {
     if (holdTetromino == nullptr) {
         holdTetromino = thisTetromino;
         thisTetromino = createTetromino(randInt());
-    } else {
+    } else if (holdCheck == false) {
         hold = *thisTetromino;
         thisTetromino = holdTetromino;
-        holdTetromino = &dump;
+        holdTetromino = &hold;
         holdCheck = true;
+    } else {
+        return;
     }
     
-    
+    initTrominoPos();
 }
 
 void Game::clearBlock() {
@@ -150,13 +163,16 @@ void Game::clearBlock() {
 
 
 void Game::checkBlock() {  // TODO: 다음 클록에 넘어가기 직전 체크해야한다
-    if (board_[x+1][y+1]) {  // TODO: use Tetromino::check
+    if (board_[x][y]) {  // TODO: use Tetromino::check
         addBlock();
         nextBlock();
     }
     if (y >= BOARD_HEIGHT) {
         addBlock();
         nextBlock();
+    }
+    if (underBlock() == 0) {
+        exit = true;
     }
     clearBlock();
 }
@@ -165,7 +181,7 @@ void Game::addBlock() {
     for (int i = 0; i < thisTetromino->size(); i++) {
         for (int j = 0; j < thisTetromino->size(); j++) {
             if (thisTetromino->check(i, j)) {
-                board_[x + i + 1][(y - thisTetromino->size() + j) + 1] = true;
+                board_[x - realX() + i + 1][(y - realY() + j - 1)] = true;
             }
         }
     }
@@ -177,9 +193,9 @@ void Game::drawBoard() {
     for (int i = 0; i < BOARD_WIDTH; i++) {
         for (int j = 0; j < BOARD_HEIGHT; j++) {
             if (board_[i][j]) {
-                console::draw(i+1, j+1, BLOCK_STRING);
+                console::draw(i + 1, j + 1, BLOCK_STRING);
             } else {
-                console::draw(i+1, j+1, " ");
+                console::draw(i + 1, j + 1, " ");
             }
         }
     }
@@ -188,34 +204,48 @@ void Game::drawBoard() {
 void Game::drawTromino(int x, int y) {
     thisTetromino->drawAt(
         SHADOW_STRING, 
-        x - calculateTromino(), 
-        underBlock() - calculateTromino() - 1
+        x, 
+        underBlock() - thisTetromino->size()
     );
 
     thisTetromino->drawAt(
         BLOCK_STRING, 
-        x - calculateTromino(), 
-        y - calculateTromino()
+        x, 
+        y - thisTetromino->size()
     );
 }
 
-void Game::drawNextTromino() {
+void Game::drawNextTromino(int x, int y) {
     console::drawBox(BOARD_WIDTH + 3, 0, BOARD_WIDTH + 3 + 5, 5); 
     console::draw(BOARD_WIDTH + 4, 0, "Next");
-    nextTetromino->original()->drawAt(BLOCK_STRING, BOARD_WIDTH + 4 + (nextTetromino->original()->size() % 4 / 2), 1 + (nextTetromino->original()->size() % 4 / 2));
+    nextTetromino->original()->drawAt(BLOCK_STRING, BOARD_WIDTH + 3 + (nextTetromino->original()->size() % 4 / 2), (nextTetromino->original()->size() % 4 / 2));
 }
 
-void Game::drawHoldTromino() {
+void Game::drawHoldTromino(int x, int y) {
     console::drawBox(BOARD_WIDTH + 3 + 6, 0, BOARD_WIDTH + 3 + 6 + 5, 5); 
     console::draw(BOARD_WIDTH + 10, 0, "Hold");
     if (holdTetromino) {
-        holdTetromino->original()->drawAt(BLOCK_STRING, BOARD_WIDTH+4 + 6 + (holdTetromino->size() % 4 / 2), 1 + (holdTetromino->size() % 4 / 2));
+        holdTetromino->original()->drawAt(BLOCK_STRING, BOARD_WIDTH + 3 + 6 + (holdTetromino->size() % 4 / 2), (holdTetromino->size() % 4 / 2));
     }
 }
 
+std::string Game::getTime() {
+    endTime = std::chrono::system_clock::now();
+    auto duration = endTime - startTime;
+    auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    
+    auto minutes = millis / (60 * 1000);
+    millis %= 60 * 1000;
+    auto seconds = millis / 1000;
+    millis %= 1000;
+
+    std::ostringstream oss;
+    oss << std::setfill('0') << std::setw(2) << minutes << ":" << std::setw(2) << seconds << "." << std::setw(2) << millis/10;
+    return oss.str();
+}
+
 void Game::drawTime() {
-    time_t endTime = time(NULL);
-    console::draw(0, BOARD_HEIGHT + 3, "time: " + std::to_string(endTime - startTime));
+    console::draw(0, BOARD_HEIGHT + 3, "time: "+getTime());
 }
 
 void Game::drawScore() {
@@ -229,12 +259,12 @@ void Game::drawScore() {
 void Game::update() {    
     inputController();
     checkBlock();
-    console::draw(BOARD_WIDTH+2, BOARD_HEIGHT, "x:"+std::to_string(x) + " y:"+std::to_string(y) + " s:"+std::to_string(thisTetromino->size()));
+    console::draw(BOARD_WIDTH+2, BOARD_HEIGHT, "x:"+std::to_string(x) + " y:"+std::to_string(y) + " s:"+std::to_string(underBlock()));
 
     if (delay >= DROP_DELAY) {
         y++;
         delay = 0;
-        console::log("test");
+        console::log(std::to_string(underBlock()) + std::to_string(x));
     } else {
         delay++;
     }
@@ -250,12 +280,17 @@ void Game::draw() {
     drawTromino(x, y);
     drawScore();
     drawTime();
-    drawHoldTromino();
-    drawNextTromino();
+    drawHoldTromino(BOARD_WIDTH, 1);
+    drawNextTromino(BOARD_WIDTH, 1);
 }
 
 // 게임 루프가 종료되어야 하는지 여부를 반환한다.
 bool Game::shouldExit() {
+    if (score >= 40) {
+        console::draw(4, BOARD_HEIGHT/2, "You Win");
+        console::draw(2, BOARD_HEIGHT/2+1, getTime());
+        exit = true;
+    }
     return exit;
 }
 
