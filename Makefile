@@ -1,27 +1,19 @@
 FLAGS = -Werror -std=c++11 -g
-LINKER_FLAGS = $(FLAGS)
 CC = g++
-
-ifneq ($(OS),Windows_NT)
-	LINKER_FLAGS += -lncurses
-endif
 
 all: main
 
-main: main.o game.o tetromino.o console.o
-	$(CC) $(LINKER_FLAGS) -o main main.o game.o tetromino.o console.o
+main: main.o cache.o cached_runner.o
+	$(CC) $(FLAGS) -o main main.o cache.o cached_runner.o
 
-console.o: console/console.cpp console/console.h
-	$(CC) $(FLAGS) -c -o console.o console/console.cpp
-
-main.o: main.cpp game.h tetromino.h
+main.o: main.cpp cache.h cached_runner.h task.h
 	$(CC) $(FLAGS) -c -o main.o main.cpp
 
-game.o: game.cpp game.h tetromino.h
-	$(CC) $(FLAGS) -c -o game.o game.cpp
+cache.o: cache.cpp cache.h
+	$(CC) $(FLAGS) -c -o cache.o cache.cpp
 
-tetromino.o: tetromino.cpp tetromino.h
-	$(CC) $(FLAGS) -c -o tetromino.o tetromino.cpp
+cached_runner.o: cached_runner.cpp cached_runner.h task_runner.h
+	$(CC) $(FLAGS) -c -o cached_runner.o cached_runner.cpp
 
 clean:
 	rm -f *.o main.exe main

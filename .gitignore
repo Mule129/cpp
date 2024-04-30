@@ -1,5 +1,7 @@
+.vscode/
+
 *.o
 main
 main.exe
-
-.vscode
+resources
+__pycache__
