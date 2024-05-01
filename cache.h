@@ -8,7 +8,23 @@
 class Cache {
 private:
   // TODO: private inner struct/class 선언 가능
+  union data
+  {
+    int intItem;
+    double doubleItem;
+  };
+
+  class Node {
+  public:
+    Node* above;
+    Node* next;
+
+    data item;
+    std::string key;
+  };
+  
   // TODO: private 멤버 변수와 함수 추가 가능
+  Node* head;
 
 public:
   Cache();
