@@ -8,20 +8,15 @@
 CachedRunner::CachedRunner(Cache &cache) {
     hit = 0;
     miss = 0;
-}
-
-std::string hash(std::string filename) {
-    char value = filename[0];
-    int result = value;
-    return std::to_string(result);
+    caches = &cache;
 }
 
 double CachedRunner::multiply(std::string filename) {
     double value = TaskRunner::multiply(filename);
-    if (cache.get(filename, value)) {
+    if (caches->get(filename, value)) {
         hit++;
     } else {
-        cache.add(hash(filename), value);
+        caches->add(filename, value);
         miss++;
     }
     return value;
@@ -29,10 +24,10 @@ double CachedRunner::multiply(std::string filename) {
 
 int CachedRunner::palindrome(std::string filename) {
     int value = TaskRunner::palindrome(filename);
-    if (cache.get(filename, value)) {
+    if (caches->get(filename, value)) {
         hit++;
     } else {
-        cache.add(hash(filename), value);
+        caches->add(filename, value);
         miss++;
     }
     return value;

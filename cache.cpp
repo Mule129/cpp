@@ -125,14 +125,22 @@ std::string Cache::toString() {
     std::string stdValue = "";
 
     Node* currentNode = head;
-    while (currentNode->next == nullptr) {
-        if (!currentNode->item.doubleItem) {
+    while (currentNode->next != nullptr) {
+        if (currentNode->item.doubleItem == -1) {
             stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.intItem) + "]");
         } else {
             stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.doubleItem) + "]");
         }
+
+        currentNode = currentNode->next;
         
     }
 
-    return stdValue;
+    if (currentNode->item.doubleItem == -1) {
+        stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.intItem) + "]");
+    } else {
+        stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.doubleItem) + "]");
+    }
+
+    return stdValue.append("\n");
 }
