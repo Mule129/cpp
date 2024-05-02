@@ -2,16 +2,17 @@
 #define CACHE_H
 
 #include <string>
+#include <iostream>
 
 #define CACHE_SIZE 10
 
 class Cache {
 private:
   // TODO: private inner struct/class 선언 가능
-  union data
+  struct data
   {
-    int intItem;
-    double doubleItem;
+    int intItem = -1;
+    double doubleItem = -1;
   };
 
   class Node {
@@ -21,14 +22,30 @@ private:
 
     data item;
     std::string key;
+
+    Node() {
+      above = nullptr;
+      next = nullptr;
+    }
   };
   
   // TODO: private 멤버 변수와 함수 추가 가능
   Node* head;
+  Node* tail;
+  int len;
+
+  void setHead(Node* newNode) {
+    head = newNode;
+  }
+
+  Node* getHead() {
+    return head;
+  }
 
 public:
   Cache();
   ~Cache();
+
   // int를 cache에 추가한다
   void add(std::string key, int value);
   // double을 cache에 추가한다

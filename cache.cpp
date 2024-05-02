@@ -1,9 +1,11 @@
 #include "cache.h"
+#include <iostream>
 
 // TODO: 필요한 함수 구현
 Cache::Cache() {
     head = nullptr;
     tail = nullptr;
+    len = 0;
 }
 
 Cache::~Cache() {
@@ -13,7 +15,9 @@ Cache::~Cache() {
 void Cache::add(std::string key, int value) {
     Node *newNode = new Node();
     newNode->key = key;
-    newNode->item.intItem = value;
+    newNode->item.intItem = value;  // TODO: change item struct 
+
+    len++;
 
     if (head == nullptr) {
         head = newNode;
@@ -22,11 +26,14 @@ void Cache::add(std::string key, int value) {
     }
 
     // delete tail node
-    Node* curruntNode = tail;
-    tail = tail->above;
-    delete curruntNode;
+    if (len >= CACHE_SIZE) {
+        Node* curruntNode = tail;
+        tail = tail->above;
+        delete curruntNode;
+    }
 
     // add node;
+    head->above = newNode;
     newNode->next = head;
     head = newNode;
 }
@@ -34,7 +41,9 @@ void Cache::add(std::string key, int value) {
 void Cache::add(std::string key, double value) {
     Node *newNode = new Node();
     newNode->key = key;
-    newNode->item.doubleItem = value;
+    newNode->item.doubleItem = value;  // TODO: change item struct
+    
+    len++;
 
     if (head == nullptr) {
         head = newNode;
@@ -43,13 +52,15 @@ void Cache::add(std::string key, double value) {
     }
 
     // delete tail node
-    Node* curruntNode = tail;
-    tail = tail->above;
-    delete curruntNode;
+    if (len >= CACHE_SIZE) {
+        Node* curruntNode = tail;
+        tail = tail->above;
+        delete curruntNode;
+    }
 
     // add node;
-    newNode->next = head;
     head->above = newNode;
+    newNode->next = head;
     head = newNode;
 }
 
@@ -85,9 +96,10 @@ bool Cache::get(std::string key, double &value) {
     }
 
     Node* currentNode = head;
-    while (currentNode->next == nullptr) {
+    while (currentNode->next != nullptr) {
         if (key == currentNode->key) {
             value = currentNode->item.doubleItem;
+            std::cout << value;
 
             // update head
             currentNode->next->above = currentNode->above;
@@ -107,14 +119,14 @@ bool Cache::get(std::string key, double &value) {
 
 std::string Cache::toString() {
     if (head == nullptr) {
-        return;
+        return "";
     }
 
     std::string stdValue = "";
 
     Node* currentNode = head;
     while (currentNode->next == nullptr) {
-        if (currentNode->item.doubleItem == NULL) {
+        if (!currentNode->item.doubleItem) {
             stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.intItem) + "]");
         } else {
             stdValue.append("[" + currentNode->key + ": " + std::to_string(currentNode->item.doubleItem) + "]");
