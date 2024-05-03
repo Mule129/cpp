@@ -41,7 +41,7 @@ private:
     HashNode* arr[HASH_SIZE];
     
 public:
-    Hash() { }
+    Hash();
     ~Hash() { }
 
     // add Node item for HashNode arr
