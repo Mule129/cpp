@@ -6,6 +6,9 @@
 #include <string>
 #include "cache.h"
 
+// class Node;
+// class Cache;
+
 class HashNode {
 public:
     Node* item;

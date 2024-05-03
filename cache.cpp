@@ -99,37 +99,44 @@ bool Cache::get(std::string key, int &value) {
         return false;
     }
 
-    Node* currentNode = head;
-    while (currentNode != nullptr) {
+    Node* currentNode; // = head;
+    // while (currentNode != nullptr) {
         
-        if (key == currentNode->key) {
-            // update head
-            value = currentNode->item.intItem;
-            if (currentNode == head) {
-                ;
-            } else if (currentNode == tail) {
-                tail->next = head;
+    //     if (key == currentNode->key) {
+    //         // update head
+    //         value = currentNode->item.intItem;
+    //         if (currentNode == head) {
+    //             ;
+    //         } else if (currentNode == tail) {
+    //             tail->next = head;
                 
-                head->above = tail;
-                tail->above = nullptr;
+    //             head->above = tail;
+    //             tail->above = nullptr;
 
-                head = tail;
-            } else {
-                currentNode->next->above = currentNode->above;
-                currentNode->above->next = currentNode->next;
+    //             head = tail;
+    //         } else {
+    //             currentNode->next->above = currentNode->above;
+    //             currentNode->above->next = currentNode->next;
 
-                currentNode->next = head;
-                head->above = currentNode;
+    //             currentNode->next = head;
+    //             head->above = currentNode;
                 
-                head = currentNode;
-            }
+    //             head = currentNode;
+    //         }
 
-            return true;
-        }
-        currentNode = currentNode->next;
+    //         return true;
+    //     }
+    //     currentNode = currentNode->next;
+    // }
+
+    currentNode = hash->get(key);
+    if (currentNode == nullptr) {
+        return false;
     }
 
-    return false;
+    value = currentNode->item.intItem;
+
+    return true;
 }
 
 bool Cache::get(std::string key, double &value) {
@@ -137,36 +144,43 @@ bool Cache::get(std::string key, double &value) {
         return false;
     }
 
-    Node* currentNode = head;
-    while (currentNode != nullptr) {
-        if (key == currentNode->key) {
-            // update head
-            value = currentNode->item.doubleItem;
-            if (currentNode == head) {
-                ;
-            } else if (currentNode == tail) {
-                tail->next = head;
+    Node* currentNode;  // = head;
+    // while (currentNode != nullptr) {
+    //     if (key == currentNode->key) {
+    //         // update head
+    //         value = currentNode->item.doubleItem;
+    //         if (currentNode == head) {
+    //             ;
+    //         } else if (currentNode == tail) {
+    //             tail->next = head;
                 
-                head->above = tail;
-                tail->above = nullptr;
+    //             head->above = tail;
+    //             tail->above = nullptr;
 
-                head = tail;
-            } else {
-                currentNode->next->above = currentNode->above;
-                currentNode->above->next = currentNode->next;
+    //             head = tail;
+    //         } else {
+    //             currentNode->next->above = currentNode->above;
+    //             currentNode->above->next = currentNode->next;
 
-                currentNode->next = head;
-                head->above = currentNode;
+    //             currentNode->next = head;
+    //             head->above = currentNode;
                 
-                head = currentNode;
-            }
+    //             head = currentNode;
+    //         }
 
-            return true;
-        }
-        currentNode = currentNode->next;
+    //         return true;
+    //     }
+    //     currentNode = currentNode->next;
+    // }
+
+    currentNode = hash->get(key);
+    if (currentNode == nullptr) {
+        return false;
     }
 
-    return false;
+    value = currentNode->item.intItem;
+
+    return true;
 }
 
 std::string Cache::toString() {
@@ -198,4 +212,76 @@ std::string Cache::toString() {
     ss << "\n";
 
     return ss.str();
+}
+
+// hash
+
+
+void Hash::add(Node* node) {
+    // get hash key
+    int hashKey = hash(node->key);
+
+    if (get(node->key) == nullptr) {  // check node duplicate
+        // create new hash node
+        HashNode* newHashNode = new HashNode;
+
+        // input item value
+        newHashNode->item = node;
+
+        HashNode* head = arr[hashKey];
+
+        newHashNode->next = head;
+        head->above = newHashNode;
+        head = newHashNode;
+    }
+}
+
+void Hash::remove(std::string key) {
+    // get hash key
+    int hashKey = hash(key);
+
+    Node* currentNode = get(key);
+
+    if (currentNode != nullptr) {  // check node duplicate
+
+        HashNode* head = arr[hashKey];
+        
+        while (head != nullptr) {
+            if (head->item->key == key) {  // if Node key equal paramiter key
+                head->above->next = head->next;
+                head->next->above = head->above;
+                delete head;
+            }
+
+            head = head->next;
+        }
+    }
+}
+
+Node* Hash::get(std::string key) {
+    int hashKey = hash(key);
+    HashNode* hashNode = arr[hashKey];
+    std::cout << "Test";
+    if (hashNode == nullptr) {
+        return nullptr;
+    } else {
+        while (hashNode != nullptr) {  // serch and check equal key
+            std::cout << "Test" << hashNode;
+            if (hashNode->item->key == key) {
+                std::cout << "Test";
+                return hashNode->item;
+            }
+            hashNode = hashNode->next;
+        }
+        std::cout << "Test";
+    }
+    return nullptr;
+}
+
+int Hash::hash(std::string key) {
+    int sum = 0;
+    for (int i = 0; i < key.length(); i++) {
+        sum += key[i];
+    }
+    return sum / HASH_SIZE;
 }

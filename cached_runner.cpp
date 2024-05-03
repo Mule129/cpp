@@ -1,6 +1,5 @@
 #include "cached_runner.h"
 #include "task_runner.h"
-#include "hash.h"
 
 #include <iostream>
 

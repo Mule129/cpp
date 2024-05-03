@@ -3,8 +3,8 @@
 
 #include <string>
 #include <iostream>
-#include "hash.h"
 
+#define HASH_SIZE 10
 #define CACHE_SIZE 10
 
 struct data
@@ -26,11 +26,42 @@ public:
     next = nullptr;
   }
 };
+// class HashNode;
+// class Hash;
+
+class HashNode {
+public:
+    Node* item;
+    HashNode* above;
+    HashNode* next;
+};
+
+class Hash {
+private:
+    HashNode* arr[HASH_SIZE];
+    
+public:
+    Hash() { }
+    ~Hash() { }
+
+    // add Node item for HashNode arr
+    void add(Node* node);
+
+    // remove Node item for HashNode arr
+    void remove(std::string key);
+
+    // get Node item for HashNode arr
+    Node* get(std::string key);
+
+    // get hash for file name
+    int hash(std::string filename);
+};
 
 class Cache {
 private:
   // TODO: private inner struct/class 선언 가능
-  
+
+
   // TODO: private 멤버 변수와 함수 추가 가능
   Node* head;
   Node* tail;
