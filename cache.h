@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include "hash.h"
 
 #define CACHE_SIZE 10
 
@@ -30,21 +31,11 @@ class Cache {
 private:
   // TODO: private inner struct/class 선언 가능
   
-
-  
-  
   // TODO: private 멤버 변수와 함수 추가 가능
   Node* head;
   Node* tail;
+  Hash* hash;
   int len;
-
-  void setHead(Node* newNode) {
-    head = newNode;
-  }
-
-  Node* getHead() {
-    return head;
-  }
 
 public:
   Cache();

@@ -18,8 +18,6 @@ void Cache::add(std::string key, int value) {
     newNode->key = key;
     newNode->item.intItem = value;
 
-    len++;
-
     if (head == nullptr) {
         head = newNode;
         tail = newNode;
@@ -29,10 +27,18 @@ void Cache::add(std::string key, int value) {
     // delete tail node
     if (len >= CACHE_SIZE) {
         Node* curruntNode = tail;
+        
+        // remove hash databases
+        hash->remove(curruntNode->key);
+
         tail = tail->above;
+        
         tail->next = nullptr;
         delete curruntNode;
+        len--;
     }
+
+    len++;
 
     // add node;
     head->above = newNode;
@@ -42,6 +48,9 @@ void Cache::add(std::string key, int value) {
     if (tail->above == nullptr) {
         tail->above = newNode;
     }
+
+    // add hash database
+    hash->add(newNode);
 }
 
 void Cache::add(std::string key, double value) {
@@ -60,10 +69,17 @@ void Cache::add(std::string key, double value) {
     // delete tail node
     if (len >= CACHE_SIZE) {
         Node* curruntNode = tail;
+        
+        // remove hash databases
+        hash->remove(curruntNode->key);
+        
         tail = tail->above;
         tail->next = NULL;
         delete curruntNode;
+        len--;
     }
+
+    len++;
 
     // add node;
     head->above = newNode;
@@ -73,6 +89,9 @@ void Cache::add(std::string key, double value) {
     if (tail->above == nullptr) {
         tail->above = newNode;
     }
+
+    // add hash database
+    hash->add(newNode);
 }
 
 bool Cache::get(std::string key, int &value) {
@@ -81,8 +100,9 @@ bool Cache::get(std::string key, int &value) {
     }
 
     Node* currentNode = head;
-    while (currentNode->next == nullptr) {
-        if (key == currentNode->key) {  // TODO : add head and tail logic
+    while (currentNode != nullptr) {
+        
+        if (key == currentNode->key) {
             // update head
             value = currentNode->item.intItem;
             if (currentNode == head) {
@@ -118,7 +138,7 @@ bool Cache::get(std::string key, double &value) {
     }
 
     Node* currentNode = head;
-    while (currentNode->next != nullptr) {
+    while (currentNode != nullptr) {
         if (key == currentNode->key) {
             // update head
             value = currentNode->item.doubleItem;

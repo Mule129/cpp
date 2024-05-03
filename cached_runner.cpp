@@ -1,6 +1,6 @@
 #include "cached_runner.h"
-
 #include "task_runner.h"
+#include "hash.h"
 
 #include <iostream>
 
@@ -12,10 +12,11 @@ CachedRunner::CachedRunner(Cache &cache) {
 }
 
 double CachedRunner::multiply(std::string filename) {
-    double value = TaskRunner::multiply(filename);
+    double value;
     if (caches->get(filename, value)) {
         hit++;
     } else {
+        value = TaskRunner::multiply(filename);
         caches->add(filename, value);
         miss++;
     }
@@ -23,10 +24,11 @@ double CachedRunner::multiply(std::string filename) {
 }
 
 int CachedRunner::palindrome(std::string filename) {
-    int value = TaskRunner::palindrome(filename);
+    int value;
     if (caches->get(filename, value)) {
         hit++;
     } else {
+        value = TaskRunner::palindrome(filename);
         caches->add(filename, value);
         miss++;
     }
