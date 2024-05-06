@@ -9,8 +9,8 @@
 
 struct data
 {
-  int intItem = -1;
-  double doubleItem = -1;
+  int intItem;
+  double doubleItem;
 };
 
 class Node {

@@ -12,9 +12,12 @@ CachedRunner::CachedRunner(Cache &cache) {
 
 double CachedRunner::multiply(std::string filename) {
     double value;
+    std::cout << "cacherunner multiply get" << std::endl;
     if (caches->get(filename, value)) {
+        std::cout << "cacherunner multiply get - if true" << std::endl;
         hit++;
     } else {
+        std::cout << "cacherunner multiply get - else" << std::endl;
         value = TaskRunner::multiply(filename);
         caches->add(filename, value);
         miss++;

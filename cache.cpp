@@ -23,26 +23,28 @@ void Cache::add(std::string key, int value) {
     Node *newNode = new Node();
     newNode->key = key;
     newNode->item.intItem = value;  // new Node에 값 대입
+    newNode->item.doubleItem = -1;
 
     if (head == nullptr) {  // head가 null이라면
         head = newNode;  // head와 tail을 new Node로 초기화
         tail = newNode;
 
         // add hash database
-        hash->add(newNode);
+        // hash->add(newNode);
         return;
     }
 
     // delete tail node
     if (len >= CACHE_SIZE) {
         Node* curruntNode = tail;
-        tail->item.doubleItem = 111;
-        
+        std::cout << "len: " << len << std::endl;
+        std::cout << "tail info: " << tail << ":" << tail->key << ":" << tail->item.intItem << ":" << tail->item.doubleItem << std::endl;
+        std::cout << "tail above info: " << tail->above << ":" << tail->above->key << ":" << tail->above->item.intItem << ":" << tail->above->item.doubleItem << std::endl;
         // remove hash databases
-        hash->remove(curruntNode->key);
+        // hash->remove(curruntNode->key);
         
         tail = tail->above;
-        tail->next = nullptr;
+        tail->above->next = nullptr;
         delete curruntNode;
         len--;
     }
@@ -59,13 +61,14 @@ void Cache::add(std::string key, int value) {
     }
 
     // add hash database
-    hash->add(newNode);
+    // hash->add(newNode);
 }
 
 void Cache::add(std::string key, double value) {
     Node *newNode = new Node();
     newNode->key = key;
     newNode->item.doubleItem = value;
+    newNode->item.intItem = -1;
     
 
     if (head == nullptr) {
@@ -73,21 +76,23 @@ void Cache::add(std::string key, double value) {
         tail = newNode;
 
         // add hash database
-        hash->add(newNode);
+        // hash->add(newNode);
         return;
     }
 
     // delete tail node
-    if (len >= CACHE_SIZE) {
-        Node** curruntNode = &tail;
+    if (len >= CACHE_SIZE - 1) {
+        Node* curruntNode = tail;
         
         // remove hash databases
-        hash->remove((*curruntNode)->key);
-        
+        // hash->remove((*curruntNode)->key);
+        std::cout << "len: " << len << std::endl;
+        std::cout << "tail info: " << tail << ":" << tail->key << ":" << tail->item.intItem << ":" << tail->item.doubleItem << std::endl;
+        std::cout << "tail above info: " << tail->above << ":" << tail->above->key << ":" << tail->above->item.intItem << ":" << tail->above->item.doubleItem << std::endl;
+
         tail = tail->above;
-        tail->item.doubleItem = 111;
-        tail->next = nullptr;
-        delete *curruntNode;
+        tail->above->next = nullptr;
+        delete curruntNode;
         len--;
     }
 
@@ -103,7 +108,7 @@ void Cache::add(std::string key, double value) {
     }
 
     // add hash database
-    hash->add(newNode);
+    // hash->add(newNode);
 }
 
 bool Cache::get(std::string key, int &value) {
@@ -111,10 +116,13 @@ bool Cache::get(std::string key, int &value) {
         return false;
     }
 
+    return false;
+
     Node* currentNode;
     Node* headNode = head;
 
-    currentNode = hash->get(key);
+    // currentNode = hash->get(key);
+    currentNode = head;
     if (currentNode == nullptr) {
         return false;
     }
@@ -160,18 +168,25 @@ bool Cache::get(std::string key, double &value) {
         return false;
     }
 
+    return false;
+
     Node* currentNode;
     Node* headNode = head;
 
-    currentNode = hash->get(key);
+    // currentNode = hash->get(key);
+    currentNode = head;
     if (currentNode == nullptr) {
         return false;
     }
+    std::cout << "double cache get" << std::endl;
 
+    // 
     while (headNode != nullptr) {
+        std::cout << "double cache get while" << std::endl;
         if (currentNode->key == headNode->key) {
             // update head
             value = headNode->item.intItem;
+            std::cout << "double cache get while if" << std::endl;
             if (headNode == head) {
                 ;
             } else if (headNode == tail) {
@@ -196,6 +211,7 @@ bool Cache::get(std::string key, double &value) {
 
             break;
         }
+        headNode = headNode->next;
     }
 
     value = headNode->item.doubleItem;
@@ -211,22 +227,16 @@ std::string Cache::toString() {
     }
 
     Node* currentNode = head;
-    while (currentNode->next != nullptr) {
+    while (currentNode != nullptr) {
         if (currentNode->item.doubleItem == -1) {
             ss << "[palindrome(" << currentNode->key <<"): " << currentNode->item.intItem <<"]";
-        } else {
+        } else if (currentNode->item.intItem == -1) {
             ss << "[multiply(" << currentNode->key <<"): " << currentNode->item.doubleItem <<"]";
         }
         ss << " -> ";
 
         currentNode = currentNode->next;
         
-    }
-
-    if (currentNode->item.doubleItem == -1) {
-        ss << "[palindrome(" << currentNode->key <<"): " << currentNode->item.intItem <<"]";
-    } else {
-        ss << "[multiply(" << currentNode->key <<"): " << currentNode->item.doubleItem <<"]";
     }
 
     ss << "\n";
