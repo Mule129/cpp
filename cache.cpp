@@ -4,25 +4,28 @@
 #include <string>
 
 
-Cache::Cache() {
+// cache 생성자. cache의 head, tail, hash를 초기화 한다.
+Cache::Cache() {  
     head = nullptr;
     tail = nullptr;
     len = 0;
     hash = new Hash;
 }
 
+// cache 소멸자. cache의 head, tail이 가리키는 주소값을 모두 해제하고, hash또한 해제해야 한다.
 Cache::~Cache() {
     
 }
 
+// cache에 값을 add 하는 함수.
+// 새로운 값이 들어올 경우 hash에 값을 추가해야한다
 void Cache::add(std::string key, int value) {
     Node *newNode = new Node();
     newNode->key = key;
-    newNode->item.intItem = value;
-    
+    newNode->item.intItem = value;  // new Node에 값 대입
 
-    if (head == nullptr) {
-        head = newNode;
+    if (head == nullptr) {  // head가 null이라면
+        head = newNode;  // head와 tail을 new Node로 초기화
         tail = newNode;
 
         // add hash database
@@ -32,14 +35,15 @@ void Cache::add(std::string key, int value) {
 
     // delete tail node
     if (len >= CACHE_SIZE) {
-        Node** curruntNode = &tail;
+        Node* curruntNode = tail;
+        tail->item.doubleItem = 111;
         
         // remove hash databases
-        hash->remove((*curruntNode)->key);
+        hash->remove(curruntNode->key);
         
         tail = tail->above;
-        tail->next = NULL;
-        delete *curruntNode;
+        tail->next = nullptr;
+        delete curruntNode;
         len--;
     }
 
@@ -81,7 +85,8 @@ void Cache::add(std::string key, double value) {
         hash->remove((*curruntNode)->key);
         
         tail = tail->above;
-        tail->next = NULL;
+        tail->item.doubleItem = 111;
+        tail->next = nullptr;
         delete *curruntNode;
         len--;
     }
@@ -121,20 +126,23 @@ bool Cache::get(std::string key, int &value) {
             if (headNode == head) {
                 ;
             } else if (headNode == tail) {
-                tail->next = head;
-                
-                head->above = tail;
-                tail->above = nullptr;
+                Node* currentNode2 = tail;
+                tail = tail->above;
+                tail->next = nullptr;
 
-                head = tail;
+                // add head
+                head->above = currentNode2;
+                currentNode2->next = head;
+                head = currentNode2;
+                currentNode2->above = nullptr;
             } else {
                 headNode->next->above = headNode->above;
                 headNode->above->next = headNode->next;
 
                 headNode->next = head;
                 head->above = headNode;
-                
                 head = headNode;
+                head->above = nullptr;
             }
 
             break;
@@ -163,58 +171,32 @@ bool Cache::get(std::string key, double &value) {
     while (headNode != nullptr) {
         if (currentNode->key == headNode->key) {
             // update head
-            value = headNode->item.doubleItem;
+            value = headNode->item.intItem;
             if (headNode == head) {
                 ;
             } else if (headNode == tail) {
-                tail->next = head;
-                
-                head->above = tail;
-                tail->above = nullptr;
+                Node* currentNode2 = tail;
+                tail = tail->above;
+                tail->next = nullptr;
 
-                head = tail;
+                // add head
+                head->above = currentNode2;
+                currentNode2->next = head;
+                head = currentNode2;
+                currentNode2->above = nullptr;
             } else {
                 headNode->next->above = headNode->above;
                 headNode->above->next = headNode->next;
 
                 headNode->next = head;
                 head->above = headNode;
-                
                 head = headNode;
+                head->above = nullptr;
             }
 
             break;
         }
-        headNode = headNode->next;
     }
-
-    // while (currentNode != nullptr) {
-    //     if (key == currentNode->key) {
-    //         // update head
-    //         value = currentNode->item.doubleItem;
-    //         if (currentNode == head) {
-    //             ;
-    //         } else if (currentNode == tail) {
-    //             tail->next = head;
-                
-    //             head->above = tail;
-    //             tail->above = nullptr;
-
-    //             head = tail;
-    //         } else {
-    //             currentNode->next->above = currentNode->above;
-    //             currentNode->above->next = currentNode->next;
-
-    //             currentNode->next = head;
-    //             head->above = currentNode;
-                
-    //             head = currentNode;
-    //         }
-
-    //         return true;
-    //     }
-    //     currentNode = currentNode->next;
-    // }
 
     value = headNode->item.doubleItem;
 
@@ -300,6 +282,7 @@ void Hash::remove(std::string key) {
                 if ((*head)->next == nullptr && (*head)->above == nullptr) {
                 } else if ((*head)->next == nullptr) {
                     (*head)->above->next = nullptr;
+                    (*head)->item->item.doubleItem = 111;
                 } else if ((*head)->above == nullptr) {
                     (*head)->next->above = nullptr;
                 } else {
