@@ -34,8 +34,10 @@ void Cache::add(std::string key, int value) {
         return;
     }
 
+    std::cout << "len pal: " << len << std::endl;
+
     // delete tail node
-    if (len >= CACHE_SIZE) {
+    if (len >= CACHE_SIZE - 1) {
         Node* curruntNode = tail;
         std::cout << "len: " << len << std::endl;
         std::cout << "tail info: " << tail << ":" << tail->key << ":" << tail->item.intItem << ":" << tail->item.doubleItem << std::endl;
@@ -43,9 +45,11 @@ void Cache::add(std::string key, int value) {
         // remove hash databases
         // hash->remove(curruntNode->key);
         
-        tail = tail->above;
         tail->above->next = nullptr;
+        tail = tail->above;
+        
         delete curruntNode;
+        std::cout << "tail delete after: " << tail->key << std::endl;
         len--;
     }
 
@@ -90,9 +94,13 @@ void Cache::add(std::string key, double value) {
         std::cout << "tail info: " << tail << ":" << tail->key << ":" << tail->item.intItem << ":" << tail->item.doubleItem << std::endl;
         std::cout << "tail above info: " << tail->above << ":" << tail->above->key << ":" << tail->above->item.intItem << ":" << tail->above->item.doubleItem << std::endl;
 
-        tail = tail->above;
+        
         tail->above->next = nullptr;
+        tail = tail->above;
+        
         delete curruntNode;
+
+        std::cout << "tail delete after: " << tail->key << std::endl;
         len--;
     }
 
@@ -135,8 +143,10 @@ bool Cache::get(std::string key, int &value) {
                 ;
             } else if (headNode == tail) {
                 Node* currentNode2 = tail;
-                tail = tail->above;
+                
                 tail->next = nullptr;
+                tail = tail->above;
+                
 
                 // add head
                 head->above = currentNode2;
@@ -191,8 +201,10 @@ bool Cache::get(std::string key, double &value) {
                 ;
             } else if (headNode == tail) {
                 Node* currentNode2 = tail;
-                tail = tail->above;
+                
                 tail->next = nullptr;
+                tail = tail->above;
+                
 
                 // add head
                 head->above = currentNode2;
@@ -227,7 +239,7 @@ std::string Cache::toString() {
     }
 
     Node* currentNode = head;
-    while (currentNode != nullptr) {
+    while (currentNode->next != nullptr) {
         if (currentNode->item.doubleItem == -1) {
             ss << "[palindrome(" << currentNode->key <<"): " << currentNode->item.intItem <<"]";
         } else if (currentNode->item.intItem == -1) {
@@ -237,6 +249,12 @@ std::string Cache::toString() {
 
         currentNode = currentNode->next;
         
+    }
+
+    if (currentNode->item.doubleItem == -1) {
+        ss << "[palindrome(" << currentNode->key <<"): " << currentNode->item.intItem <<"]";
+    } else if (currentNode->item.intItem == -1) {
+        ss << "[multiply(" << currentNode->key <<"): " << currentNode->item.doubleItem <<"]";
     }
 
     ss << "\n";
