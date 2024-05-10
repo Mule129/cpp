@@ -1,19 +1,25 @@
-FLAGS = -Werror -std=c++11 -g
-CC = g++
+CC = g++-11
+CFLAGS = -std=c++-11 -Werror -Wall -g
 
-all: main
+all: main.exe
 
-main: main.o cache.o cached_runner.o
-	$(CC) $(FLAGS) -o main main.o cache.o cached_runner.o
+main.exe: main.o linked_list.o list.o stack.o queue.o
+	$(CC) $(CFLAGS) -o main.exe main.o linked_list.o list.o stack.o queue.o
 
-main.o: main.cpp cache.h cached_runner.h task.h
-	$(CC) $(FLAGS) -c -o main.o main.cpp
+main.o: main.cpp
+	$(CC) $(CFLAGS) -c main.cpp
 
-cache.o: cache.cpp cache.h
-	$(CC) $(FLAGS) -c -o cache.o cache.cpp
+linked_list.o: linked_list.cpp linked_list.h
+	$(CC) $(CFLAGS) -c linked_list.cpp
 
-cached_runner.o: cached_runner.cpp cached_runner.h task_runner.h
-	$(CC) $(FLAGS) -c -o cached_runner.o cached_runner.cpp
+list.o: list.cpp list.h
+	$(CC) $(CFLAGS) -c list.cpp
+
+stack.o: stack.cpp stack.h
+	$(CC) $(CFLAGS) -c stack.cpp
+
+queue.o: queue.cpp queue.h
+	$(CC) $(CFLAGS) -c queue.cpp
 
 clean:
-	rm -f *.o main.exe main
+	rm -f *.o main.exe

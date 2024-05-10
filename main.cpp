@@ -1,54 +1,59 @@
-#include "cached_runner.h"
-#include "task.h"
+// TODO: include를 적절하게 추가
+#include "list.h"
+#include "queue.h"
+#include "stack.h"
 #include <iostream>
-#include <sstream>
-#include <string>
 
-const bool DEBUG = true;
+// TODO: T 타입을 적절한 타입으로 변경
+void print(LinkedList &list) { list.print(); }
 
-// 디버그 용 출력 함수
-void print(const std::string &message) {
-  if (DEBUG) {
-    std::cout << message << std::endl;
+void testQueue() {
+  Queue queue;
+
+  for (int i = 0; i < 10; i++)
+    queue.push(i);
+
+  for (int i = 100; i > 90; i--)
+    queue += i;
+
+  std::cout << queue.peek() << std::endl;
+  print(queue);
+
+  for (int i = 0; i < 5; i++) {
+    std::cout << queue.pop() << std::endl;
   }
+  print(queue);
 }
 
-// double 값을 문자열로 변환한다
-std::string doubleToString(double value) {
-  std::ostringstream ss;
-  ss << value;
-  return ss.str();
+void testStack() {
+  Stack stack;
+
+  for (int i = 0; i < 10; i++)
+    stack.push(i);
+
+  for (int i = 100; i > 90; i--)
+    stack += i;
+
+  std::cout << stack.peek() << std::endl;
+  print(stack);
+
+  for (int i = 0; i < 5; i++) {
+    std::cout << stack.pop() << std::endl;
+  }
+  print(stack);
+}
+
+void testList() {
+  List list;
+
+  for (int i = 0; i < 10; i++)
+    list.insert(i, i);
+
+  print(list);
 }
 
 int main() {
-  
-  Cache cache;  // cache 선언
-  CachedRunner runner(cache);  // cache 값을 넣은 runner 선언
-  Task task;  // palindrome, multiply 값을 순차적으로 구하기 위한 task 선언
-
-  TaskSet taskSet("resources/task_set.txt");  // task set read
-  int index = 0;
-
-  // 태스크를 계속 읽어 수행한다
-  while (taskSet.getNext(task)) {
-    print("[TASK #" + std::to_string(index++) + "]");
-    switch (task.type) {  // task type 확인
-    case MULTIPLY: {
-      double result = runner.multiply(task.filename);  // multiply 값을 runner를 통해 읽어들임(cache, hash 상에서 추가, 위치 변경, 삭제가 이루어짐)
-      print("multiply(" + task.filename + ") = " + doubleToString(result));
-    } break;
-    case PALINDROME: {
-      int result = runner.palindrome(task.filename); // multiply 값을 runner를 통해 읽어들임(cache, hash 상에서 추가, 위치 변경, 삭제가 이루어짐)
-      print("palindrome(" + task.filename + ") = " + std::to_string(result));
-    } break;
-    }
-
-    print("\n[CACHE]");
-    print(cache.toString());  // cache 값을 toString 을 통하여 string으로 변환
-  }
-
-  print("Hits: " + std::to_string(runner.hits()));
-  print("Misses: " + std::to_string(runner.misses()));
-  print("Hit ratio: " + doubleToString((double)runner.hits() /
-                                       (runner.hits() + runner.misses())));
+  testQueue();
+  testStack();
+  testList();
 }
